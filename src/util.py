@@ -1,10 +1,10 @@
 """
-Name:
-Author:
-Date:
+Name: util.py
+Author: Sam O
+Date: 3/31/18
 
 Info:
-
+File for useful classes and functions.
 
 
 

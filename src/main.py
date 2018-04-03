@@ -1,9 +1,10 @@
 """
-Name:
-Author:
-Date:
+Name: main.py
+Author: Sam O
+Date: 3/31/18
 
 Info:
+Main run file for this app
 
 
 
