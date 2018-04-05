@@ -21,11 +21,12 @@ import util
 
 starting_positions = {"Center": [90, 162], "Right": [90, 216], "Left": [90, 80]}
 
-# Functions
+
+# Update figure
+# Called when Update Button is pressed
 def update(event):
     starting_radio_selection = util.get_radio_selection(starting_radio, starting_option_list)
     alliance_radio_selection = util.get_radio_selection(alliance_radio, alliance_option_list)
-
 
     # Center image according to radio_selction
     overlay.transpose(starting_positions[starting_radio_selection])
@@ -36,39 +37,35 @@ def update(event):
     ax.set_xlim(x_bounds)
     ax.set_ylim(y_bounds)
 
-    # get vals from textboxes
-    try:
-        verts[0] = (util.get_number(startx), util.get_number(starty))
-        verts[1] = (util.get_number(endx), util.get_number(endy))
-    except:
-        verts.append((util.get_number(endx), util.get_number(endy)))
+    # Get Values from Textboxes and put them into verts
+    verts = []
+    verts.append((util.get_number(startx), util.get_number(starty)))
+    verts.append((util.get_number(mid1x), util.get_number(mid1y)))
+    verts.append((util.get_number(mid2x), util.get_number(mid2y)))
+    verts.append((util.get_number(endx), util.get_number(endy)))
 
+    # Create Curve
     curve = util.Curve(ax, verts)
     curve.draw()
 
 
-# Colors
-RED = (1, 0, 0, 1)
-BLUE = (0, 0, 1, 1)
-YELLOW = (1, 1, 0, 1)
-BLACK = (0, 0, 0, 1)
+# Vertice list
+verts = [(0, 0),
+         (50, 0),
+         (0, 50),
+         (100, 50)]
 
 
-
-verts = [(0, 0)]
-curves = []
-
-
-
+# Making a matplotlib fugure
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-# Starting Radio
+# Starting Radio Button
 ax_starting_radio = plt.axes([0.0, 0.5, 0.1, .1])
 starting_option_list = ["Left", "Center", "Right"]
 starting_radio = widget.RadioButtons(ax_starting_radio, starting_option_list)
 
-# Alliance Radio
+# Alliance Radio Buttons
 ax_alliance_radio = plt.axes([0.0, 0.7, 0.1, 0.1])
 alliance_option_list = ["Red", "Blue"]
 alliance_radio = widget.RadioButtons(ax_alliance_radio, alliance_option_list)
@@ -90,38 +87,26 @@ mid1y_ax = plt.axes([.7, .1, .05, .05])
 mid2x_ax = plt.axes([.6, 0, .05, .05])
 mid2y_ax = plt.axes([.7, 0, .05, .05])
 
-startx = widget.TextBox(startx_ax, "Start X", initial="0")
-starty = widget.TextBox(starty_ax, "Start Y", initial="0")
-endx = widget.TextBox(endx_ax, "End X", initial="0")
-endy = widget.TextBox(endy_ax, "End Y", initial="0")
-mid1x = widget.TextBox(mid1x_ax, "Mid1 X", initial="0")
-mid1y = widget.TextBox(mid1y_ax, "Mid1 Y", initial="0")
-mid2x = widget.TextBox(mid2x_ax, "Mid2 X", initial="0")
-mid2y = widget.TextBox(mid2y_ax, "Mid2 Y", initial="0")
+startx = widget.TextBox(startx_ax, "Start X", initial=str(verts[0][0]))
+starty = widget.TextBox(starty_ax, "Start Y", initial=str(verts[0][1]))
+mid1x = widget.TextBox(mid1x_ax, "Mid1 X", initial=str(verts[1][0]))
+mid1y = widget.TextBox(mid1y_ax, "Mid1 Y", initial=str(verts[1][1]))
+mid2x = widget.TextBox(mid2x_ax, "Mid2 X", initial=str(verts[2][0]))
+mid2y = widget.TextBox(mid2y_ax, "Mid2 Y", initial=str(verts[2][1]))
+endx = widget.TextBox(endx_ax, "End X", initial=str(verts[3][0]))
+endy = widget.TextBox(endy_ax, "End Y", initial=str(verts[3][1]))
 
-
-# startx.on_submit(util.submit_number)
-# starty.on_submit(util.submit_number)
-# endx.on_submit(util.submit_number)
-# endy.on_submit(util.submit_number)
-# mid1x.on_submit(util.submit_number)
-# mid1y.on_submit(util.submit_number)
-# mid2x.on_submit(util.submit_number)
-# mid2y.on_submit(util.submit_number)
-
+# Draw Background image
 overlay.draw()
 
-#Graph Bounds
+# Set graph bound to 0 --> overlay size
 x_bounds = (0, overlay.dim()[0])
 y_bounds = (0, overlay.dim()[1])
 
-xs, ys = zip(*verts)
-
-
+# Set graph bounds
 ax.set_xlim(x_bounds)
 ax.set_ylim(y_bounds)
 
-
-
+# Show graph
 plt.show()
 
