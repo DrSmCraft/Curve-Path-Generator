@@ -47,6 +47,7 @@ def update(event):
     # Create Curve
     curve = util.Curve(ax, verts)
     curve.draw()
+    print(curve.generate_code())
 
 
 # Vertice list
@@ -75,7 +76,7 @@ ax_update_button = plt.axes([0.0, 0.0, 0.1, 0.1])
 text = "Update"
 update_button = widget.Button(ax_update_button, text)
 update_button.on_clicked(update)
-overlay = util.Overlay(ax, "overlay.png")
+overlay = util.Overlay(ax, 'C:\\Users\\Notebook\\Desktop\\Curve Path Generator\\src\\overlay.png')
 
 # Text Inputs
 startx_ax = plt.axes([.2, .1, .05, .05])

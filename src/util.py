@@ -15,7 +15,7 @@ import matplotlib.path as path
 import matplotlib.patches as patches
 import matplotlib.image as m_image
 import PIL.Image as image
-
+import numpy as np
 
 # Class for Curves
 class Curve():
@@ -32,6 +32,9 @@ class Curve():
         self.path = path.Path(self.verts, self.codes)
         self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
 
+
+
+
     def draw(self):
         self.patch.set_visible(True)
         self.plot.add_patch(self.patch)
@@ -39,6 +42,38 @@ class Curve():
     def clear(self):
         # self.patch.remove()
         self.patch.set_visible(False)
+
+    def generate_comment(self):
+        string = '/*{"start":{"x":%i, "y":%i}, "mid1":{"x":%i, "y":%i}, "mid2":{"x":%i, "y":%i}, "end":{"x":%i, "y":%i}} */' % (self.verts[0][0], self.verts[0][1], self.verts[1][0], self.verts[1][1], self.verts[2][0], self.verts[2][1], self.verts[3][0], self.verts[3][1])
+        return string
+
+    def generate_code(self):
+        # new
+        # PathSegment(t ->
+        # / *{"start": {"x": 100, "y": 25}, "mid1": {"x": 10, "y": 90}, "mid2": {"x": 110, "y": 100},
+        #     "end": {"x": 150, "y": 195}} * /
+        #    (195 + -330 * t + 420 * Math.pow(t, 2)) / (-270 + 1140 * t + -750 * Math.pow(t, 2))
+        # , 214)
+        x = self.generate_equation_numpy()[0].deriv()
+        y = self.generate_equation_numpy()[1].deriv()
+        code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), 214)' % (self.generate_comment(), int(round(y[0])), int(round(y[1])), int(round(y[2])), int(round(x[0])), int(round(x[1])), int(round(x[2])))
+        return code
+        pass
+
+    def generate_equation_numpy(self):
+        # Finding equation
+        xlist, ylist = zip(*self.verts)
+        tt = np.linspace(0, 5, len(xlist))
+        x_param = np.polyfit(tt, xlist, 3)
+        y_param = np.polyfit(tt, ylist, 3)
+        eq_x = np.poly1d(x_param)
+        eq_y = np.poly1d(y_param)
+        return [eq_x, eq_y]
+
+    def generate_equation(self):
+        # https: // javascript.info / bezier - curve
+        x = '(1-x)**2 * %i + 2(1-x) '
+        pass
 
 
 # Class for Overlay
