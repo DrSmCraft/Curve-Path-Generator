@@ -6,8 +6,6 @@ Date: 3/31/18
 Info:
 File for useful classes and functions.
 
-
-
 """
 
 # Imports
@@ -16,6 +14,7 @@ import matplotlib.patches as patches
 import matplotlib.image as m_image
 import PIL.Image as image
 import numpy as np
+import math
 
 # Class for Curves
 class Curve():
@@ -31,6 +30,8 @@ class Curve():
             self.codes.append(4)
         self.path = path.Path(self.verts, self.codes)
         self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
+        self.patch.fill = False
+        self.patch.set_color(self.color)
 
 
 
@@ -56,9 +57,9 @@ class Curve():
         # , 214)
         x = self.generate_equation_numpy()[0].deriv()
         y = self.generate_equation_numpy()[1].deriv()
-        code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), 214)' % (self.generate_comment(), int(round(y[0])), int(round(y[1])), int(round(y[2])), int(round(x[0])), int(round(x[1])), int(round(x[2])))
+        code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), %i)' % (self.generate_comment(), int(round(y[0])), int(round(y[1])), int(round(y[2])), int(round(x[0])), int(round(x[1])), int(round(x[2])), int(math.ceil(self.get_length())))
         return code
-        pass
+
 
     def generate_equation_numpy(self):
         # Finding equation
@@ -70,10 +71,28 @@ class Curve():
         eq_y = np.poly1d(y_param)
         return [eq_x, eq_y]
 
-    def generate_equation(self):
-        # https: // javascript.info / bezier - curve
-        x = '(1-x)**2 * %i + 2(1-x) '
-        pass
+    # def generate_equation(self):
+    #     # https: // javascript.info / bezier - curve
+    #     x = '(1-x)**2 * %i + 2(1-x) '
+
+    def get_length(self):
+        # # https://stackoverflow.com/questions/29438398/cheap-way-of-calculating-cubic-bezier-length
+        # TODO Fix this function - I don't know how to get length of a curve, right now Im averaging distance between control points
+        chord = distance(self.verts[3], self.verts[0])
+        cont_net = distance(self.verts[0], self.verts[1]) + distance(self.verts[1], self.verts[2]) + distance(self.verts[2], self.verts[3])
+        return (cont_net + chord) / 2
+
+
+
+    def value_at_t(self, t):
+        # https://stackoverflow.com/questions/17099776/trying-to-find-length-of-a-bezier-curve-with-4-points
+        # t2 = t * t;
+        # t3 = t2 * t;
+        # return a + (-a * 3 + t * (3 * a - a * t)) * t + (3 * b + t * (-6 * b + b * 3 * t)) * t + (c * 3 - c * 3 * t) * t2 + d * t3
+        eq1 = self.generate_equation_numpy()[0](t)
+        eq2 = self.generate_equation_numpy()[1](t)
+        return distance((eq1, 0), (0, eq2))
+
 
 
 # Class for Overlay
@@ -97,6 +116,10 @@ class Overlay():
         self.plot.imshow(self.img, extent=(0-transposition_coord[0], self.dim()[0] - transposition_coord[0], 0-transposition_coord[1], self.dim()[1] - transposition_coord[1]))
 
 
+def distance(p1, p2):
+    return math.sqrt(((p2[1] - p1[1]) ** 2) + (p2[0] - p1[0]) ** 2)
+
+
 # Function to get radiobutton input
 def get_radio_selection(radio, option_list):
     for select in range(len(radio.circles)):
@@ -111,3 +134,12 @@ def get_number(textbox):
     except ValueError:
         return None
 
+
+# Function to put text into Textbox
+def put_text(textbox, text):
+    #textbox.
+    textbox.text = text
+
+def write(location, text):
+    with open(location, 'a') as file:
+        file.write(text + '\n\n')

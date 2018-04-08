@@ -6,9 +6,6 @@ Date: 3/31/18
 Info:
 Main run file for this app
 
-
-
-
 """
 
 
@@ -28,7 +25,7 @@ def update(event):
     starting_radio_selection = util.get_radio_selection(starting_radio, starting_option_list)
     alliance_radio_selection = util.get_radio_selection(alliance_radio, alliance_option_list)
 
-    # Center image according to radio_selction
+    # Center image according to radio_selection
     overlay.transpose(starting_positions[starting_radio_selection])
     
     # set  graph bounds to radio_selection
@@ -45,16 +42,29 @@ def update(event):
     verts.append((util.get_number(endx), util.get_number(endy)))
 
     # Create Curve
-    curve = util.Curve(ax, verts)
+    curve = util.Curve(ax, verts, color=(1, 0, 0, 1))
     curve.draw()
-    print(curve.generate_code())
+    for text in fig.texts:
+        text.remove()
+    util.write(text_location, curve.generate_code())
+    fig.text(0, .9, curve.generate_code())
 
 
-# Vertice list
+# Path to image
+image_location = 'C:\\Users\\Notebook\\Desktop\\Curve Path Generator\\src\\overlay.png'
+
+# Path to output file
+text_location = 'C:\\Users\\Notebook\\Desktop\\Curve Path Generator\\src\\code.txt'
+
+# Vertices list
 verts = [(0, 0),
          (50, 0),
          (0, 50),
          (100, 50)]
+default_verts = [(0, 0),
+                 (50, 0),
+                 (0, 50),
+                 (100, 50)]
 
 
 # Making a matplotlib fugure
@@ -73,10 +83,18 @@ alliance_radio = widget.RadioButtons(ax_alliance_radio, alliance_option_list)
 
 # Update Button
 ax_update_button = plt.axes([0.0, 0.0, 0.1, 0.1])
-text = "Update"
-update_button = widget.Button(ax_update_button, text)
+update_text = "Update"
+update_button = widget.Button(ax_update_button, update_text)
 update_button.on_clicked(update)
-overlay = util.Overlay(ax, 'C:\\Users\\Notebook\\Desktop\\Curve Path Generator\\src\\overlay.png')
+
+# Create image overlay
+overlay = util.Overlay(ax, image_location)
+
+# Reset Button
+# ax_reset_button = plt.axes([0.9, 0.0, 0.1, 0.1])
+# reset_text = "Reset"
+# reset_button = widget.Button(ax_reset_button, reset_text)
+# reset_button.on_clicked(reset)
 
 # Text Inputs
 startx_ax = plt.axes([.2, .1, .05, .05])
@@ -88,14 +106,18 @@ mid1y_ax = plt.axes([.7, .1, .05, .05])
 mid2x_ax = plt.axes([.6, 0, .05, .05])
 mid2y_ax = plt.axes([.7, 0, .05, .05])
 
-startx = widget.TextBox(startx_ax, "Start X", initial=str(verts[0][0]))
-starty = widget.TextBox(starty_ax, "Start Y", initial=str(verts[0][1]))
-mid1x = widget.TextBox(mid1x_ax, "Mid1 X", initial=str(verts[1][0]))
-mid1y = widget.TextBox(mid1y_ax, "Mid1 Y", initial=str(verts[1][1]))
-mid2x = widget.TextBox(mid2x_ax, "Mid2 X", initial=str(verts[2][0]))
-mid2y = widget.TextBox(mid2y_ax, "Mid2 Y", initial=str(verts[2][1]))
-endx = widget.TextBox(endx_ax, "End X", initial=str(verts[3][0]))
-endy = widget.TextBox(endy_ax, "End Y", initial=str(verts[3][1]))
+startx = widget.TextBox(startx_ax, "Start X", initial=str(default_verts[0][0]))
+starty = widget.TextBox(starty_ax, "Start Y", initial=str(default_verts[0][1]))
+mid1x = widget.TextBox(mid1x_ax, "Mid1 X", initial=str(default_verts[1][0]))
+mid1y = widget.TextBox(mid1y_ax, "Mid1 Y", initial=str(default_verts[1][1]))
+mid2x = widget.TextBox(mid2x_ax, "Mid2 X", initial=str(default_verts[2][0]))
+mid2y = widget.TextBox(mid2y_ax, "Mid2 Y", initial=str(default_verts[2][1]))
+endx = widget.TextBox(endx_ax, "End X", initial=str(default_verts[3][0]))
+endy = widget.TextBox(endy_ax, "End Y", initial=str(default_verts[3][1]))
+
+# Code output
+# ax_code_output = plt.axes([0.2, 0.85, 0.8, 0.15])
+# code_output = widget.TextBox(ax_code_output, "Code Output", initial="Code Output")
 
 # Draw Background image
 overlay.draw()
