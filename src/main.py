@@ -6,6 +6,8 @@ Date: 3/31/18
 Info:
 Main run file for this app
 
+App based on Team 340 path generator
+Located here ---> http://paths.rpappa.com/
 """
 
 
@@ -48,12 +50,13 @@ class CurvePathGenerator():
                               (50, 0),
                               (0, 50),
                               (100, 50)]
+        self.using_raw_rpappa_coords = True
 
         # Path to image
-        self.image_location = 'C:\\Users\\Notebook\\Desktop\\Curve Path Generator\\src\\overlay.png'
+        self.image_location = 'overlay.png'
 
         # Path to output file
-        self.text_location = 'C:\\Users\\Notebook\\Desktop\\Curve Path Generator\\src\\code.txt'
+        self.text_location = 'code.txt'
 
         self.curves = []
 
@@ -69,6 +72,7 @@ class CurvePathGenerator():
 
         # Making a matplotlib figure
         self.fig = plt.figure()
+        self.fig.canvas.set_window_title("Curve Path Generator")
         self.ax = self.fig.add_subplot(111)
 
 
@@ -81,6 +85,11 @@ class CurvePathGenerator():
         ax_alliance_radio = plt.axes([0.0, 0.7, 0.1, 0.1])
         self.alliance_option_list = ["Red", "Blue"]
         self.alliance_radio = widget.RadioButtons(ax_alliance_radio, self.alliance_option_list)
+
+        # Coord system radio button
+        ax_coord_system = plt.axes([0.8, 0.8, 0.2, 0.1])
+        self.coord_system_option_list = ["Native Coord System", "Rpappa Coord System"]
+        self.coord_system_radio = widget.RadioButtons(ax_coord_system, self.coord_system_option_list)
 
         # Update Button
         ax_update_button = plt.axes([0.0, 0.0, 0.1, 0.1])
@@ -116,13 +125,15 @@ class CurvePathGenerator():
         self.endx = widget.TextBox(endx_ax, "End X", initial=str(self.default_verts[3][0]))
         self.endy = widget.TextBox(endy_ax, "End Y", initial=str(self.default_verts[3][1]))
 
+        #self.create_checkboxes()
+
         # Set graph bound to 0 --> overlay size
-        x_bounds = (0, self.overlay.dim()[0])
-        y_bounds = (0, self.overlay.dim()[1])
+        self.x_bounds = (0, self.overlay.dim()[0])
+        self.y_bounds = (0, self.overlay.dim()[1])
 
         # Set graph bounds
-        self.ax.set_xlim(x_bounds)
-        self.ax.set_ylim(y_bounds)
+        self.ax.set_xlim(self.x_bounds)
+        self.ax.set_ylim(self.y_bounds)
 
         # Draw Background image
         self.overlay.draw()
@@ -134,16 +145,32 @@ class CurvePathGenerator():
         starting_radio_selection = util.get_radio_selection(self.starting_radio, self.starting_option_list)
         alliance_radio_selection = util.get_radio_selection(self.alliance_radio, self.alliance_option_list)
 
-        # Center image according to radio_selection
-        self.overlay.transpose(self.starting_positions[starting_radio_selection])
+        if util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[0]:
+            self.using_raw_rpappa_coords = False
+        elif util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[1]:
+            self.using_raw_rpappa_coords = True
 
-        # set  graph bounds to radio_selection
-        x_bounds = (0 - self.starting_positions[starting_radio_selection][0],
+        if not self.using_raw_rpappa_coords:
+            # Center image according to radio_selection
+            self.overlay.transpose(self.starting_positions[starting_radio_selection])
+
+            # set  graph bounds to radio_selection
+            self.x_bounds = (0 - self.starting_positions[starting_radio_selection][0],
                     self.overlay.dim()[0] - self.starting_positions[starting_radio_selection][0])
-        y_bounds = (0 - self.starting_positions[starting_radio_selection][1],
+            self.y_bounds = (0 - self.starting_positions[starting_radio_selection][1],
                     self.overlay.dim()[1] - self.starting_positions[starting_radio_selection][1])
-        self.ax.set_xlim(x_bounds)
-        self.ax.set_ylim(y_bounds)
+            self.ax.set_xlim(self.x_bounds)
+            self.ax.set_ylim(self.y_bounds)
+        elif self.using_raw_rpappa_coords:
+            # TODO Fix this, doesnt want to center to (0, 0) in top left corner
+            self.overlay.transpose((0, -self.overlay.dim()[1]))
+            # set  graph bounds to radio_selection
+            self.x_bounds = (0, self.overlay.dim()[0])
+            self.y_bounds = (self.overlay.dim()[1], 0)
+            self.ax.set_xlim(self.x_bounds)
+            self.ax.set_ylim(self.y_bounds)
+
+
 
         # Get Values from Textboxes and put them into verts
         verts = []
@@ -165,11 +192,26 @@ class CurvePathGenerator():
         util.write(self.text_location, curve.generate_code())
         self.fig.text(0, .9, curve.generate_code())
 
+        #self.create_checkboxes()
 
+
+
+    def create_checkboxes(self):
+        # Create checkboxes for curves
+        check_ax = plt.axes([.8, .8, .1, .1])
+        self.checkboxes = widget.CheckButtons(check_ax, [str(curve) for curve in self.curves],
+                                              [curve.get_visible() for curve in self.curves])
+
+        self.checkboxes.labels = [str(curve) for curve in self.curves]
+        # self.checkboxes.active = [curve.get_visible() for curve in self.curves]
+        print(self.checkboxes.labels)
+        # self.checkboxes.
 
     def show(self):
         # Show the Graph
         plt.show()
+
+
 
 
 if __name__ == "__main__":

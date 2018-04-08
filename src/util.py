@@ -21,10 +21,11 @@ class Curve():
     # Argument plot is an axis
     # Argument verts is vertices list
     # Argument Color is for curve color, defaults to black
-    def __init__(self, plot, verts, color=(0, 0, 0, 1)):
+    def __init__(self, plot, verts, color=(0, 0, 0, 1), name="Curve"):
         self.plot = plot
         self.verts = verts
         self.color = color
+        self.name = name
         self.codes = [1]
         for vert in range(len(self.verts) - 1):
             self.codes.append(4)
@@ -93,6 +94,11 @@ class Curve():
         eq2 = self.generate_equation_numpy()[1](t)
         return distance((eq1, 0), (0, eq2))
 
+    def __str__(self):
+        return "Curve: " + str(self.name)
+
+    def get_visible(self):
+        return self.patch.get_visible()
 
 
 # Class for Overlay
@@ -112,9 +118,10 @@ class Overlay():
     def dim(self):
         return [self.im.width, self.im.height]
 
-    def transpose(self, transposition_coord):
-        self.plot.imshow(self.img, extent=(0-transposition_coord[0], self.dim()[0] - transposition_coord[0], 0-transposition_coord[1], self.dim()[1] - transposition_coord[1]))
-
+    def transpose(self, transposition_coord, origin='lower'):
+        self.plot.set_visible(False)
+        self.plot.imshow(self.img, origin=origin, extent=(0-transposition_coord[0], self.dim()[0] - transposition_coord[0], 0-transposition_coord[1], self.dim()[1] - transposition_coord[1]))
+        self.plot.set_visible(True)
 
 def distance(p1, p2):
     return math.sqrt(((p2[1] - p1[1]) ** 2) + (p2[0] - p1[0]) ** 2)
@@ -141,5 +148,5 @@ def put_text(textbox, text):
     textbox.text = text
 
 def write(location, text):
-    with open(location, 'a') as file:
+    with open(location, 'a+') as file:
         file.write(text + '\n\n')
