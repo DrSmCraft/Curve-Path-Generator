@@ -50,7 +50,7 @@ class CurvePathGenerator():
         self.using_raw_rpappa_coords = True
 
         # Path to image
-        self.image_location = 'overlay.png'
+        self.image_location = 'src\\overlay.png'
 
         # Path to output file
         self.text_location = 'code.txt'
