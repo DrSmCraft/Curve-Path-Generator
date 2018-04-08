@@ -19,10 +19,7 @@ import matplotlib.pyplot as plt
 import util
 
 
-
-
-
-
+# Main Class
 class CurvePathGenerator():
     def __init__(self):
         self.starting_positions = {"Center": [90, 162],
@@ -53,7 +50,7 @@ class CurvePathGenerator():
         self.using_raw_rpappa_coords = True
 
         # Path to image
-        self.image_location = 'overlay.png'
+        self.image_location = 'src\\overlay.png'
 
         # Path to output file
         self.text_location = 'code.txt'
@@ -65,9 +62,9 @@ class CurvePathGenerator():
 
     def reset(self, event):
         # Clear all curves
-        # for curve in self.curves:
-        #     print(curve)
-        #     curve.clear()
+        for curve in self.curves:
+            print(curve)
+            curve.clear()
         self.curves = []
 
         # Making a matplotlib figure
@@ -170,8 +167,6 @@ class CurvePathGenerator():
             self.ax.set_xlim(self.x_bounds)
             self.ax.set_ylim(self.y_bounds)
 
-
-
         # Get Values from Textboxes and put them into verts
         verts = []
         verts.append((util.get_number(self.startx), util.get_number(self.starty)))
@@ -191,6 +186,7 @@ class CurvePathGenerator():
             text.remove()
         util.write(self.text_location, curve.generate_code())
         self.fig.text(0, .9, curve.generate_code())
+        print(curve.generate_code())
 
         #self.create_checkboxes()
 
@@ -210,8 +206,6 @@ class CurvePathGenerator():
     def show(self):
         # Show the Graph
         plt.show()
-
-
 
 
 if __name__ == "__main__":

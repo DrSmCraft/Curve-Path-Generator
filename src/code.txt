@@ -1,1 +1,77 @@
 
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":1000, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (1820 * Math.pow(t, 2) + -1836 * t + 335), 1107)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":1000, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (1820 * Math.pow(t, 2) + -1836 * t + 335), 1107)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":0, "y":100}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (145 * Math.pow(t, 2) + -126 * t + 22) / (20 * Math.pow(t, 2) + -36 * t + 11), 181)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":100, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-50}} */
+ (-55 * Math.pow(t, 2) + 90 * t + -22) / (200 * Math.pow(t, 2) + -216 * t + 43), 233)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":60, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-50}} */
+ (-55 * Math.pow(t, 2) + 90 * t + -22) / (128 * Math.pow(t, 2) + -144 * t + 30), 196)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":20, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-50}} */
+ (-55 * Math.pow(t, 2) + 90 * t + -22) / (56 * Math.pow(t, 2) + -72 * t + 17), 164)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":-20, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-50}} */
+ (-55 * Math.pow(t, 2) + 90 * t + -22) / (-16 * Math.pow(t, 2) + 0 * t + 4), 164)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":-20, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-150}} */
+ (-75 * Math.pow(t, 2) + 126 * t + -32) / (-16 * Math.pow(t, 2) + 0 * t + 4), 239)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":0, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-150}} */
+ (-75 * Math.pow(t, 2) + 126 * t + -32) / (20 * Math.pow(t, 2) + -36 * t + 11), 227)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":-30, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-150}} */
+ (-75 * Math.pow(t, 2) + 126 * t + -32) / (-34 * Math.pow(t, 2) + 18 * t + 1), 247)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":0, "y":-30}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":-150}} */
+ (-129 * Math.pow(t, 2) + 180 * t + -42) / (20 * Math.pow(t, 2) + -36 * t + 11), 257)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":50}, "end":{"x":100, "y":50}} */
+ (-35 * Math.pow(t, 2) + 54 * t + -11) / (110 * Math.pow(t, 2) + -126 * t + 27), 167)
+
