@@ -2,12 +2,11 @@
      
      
 A Curve generator for FRC PowerUp. Made for Team 2791 and based off of Team 340's pathing code.
-To use run "main.py".
-After every change, press "Update"
+    
        
 How to use:
 Open cmd in root directory of the project. Run this command: venv\Scripts\python.exe src\main.py  
-    
+After every change, press "Update"    
      
 Good to know:   
 -This is not very accurate at generating code. This will change in future. This app is accurate at displaying paths; it should be used to visualize paths.  
