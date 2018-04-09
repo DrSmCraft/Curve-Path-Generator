@@ -14,5 +14,10 @@ Good to know:
 -Reset Button doesn't work   
 -Alliance selection doesnt work   
      
-      
+     
+Future Plans:   
+-Change Gui to Use PyQt5 instead of Matplotlib.   
+-Make Curve Code more accurate.
+   
+    
 This app was not tested extensively. Let me know of bugs and glitches.
