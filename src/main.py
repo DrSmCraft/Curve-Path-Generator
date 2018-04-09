@@ -8,6 +8,7 @@ Main run file for this app
 
 App based on Team 340 path generator
 Located here ---> http://paths.rpappa.com/
+Github ---> https://github.com/greater-rochester-robotics
 """
 
 
@@ -18,6 +19,8 @@ import matplotlib.pyplot as plt
 
 import util
 
+# TODO Change GUI to PyQt5
+# https://stackoverflow.com/questions/12459811/how-to-embed-matplotlib-in-pyqt-for-dummies
 
 # Main Class
 class CurvePathGenerator():
