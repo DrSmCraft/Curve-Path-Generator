@@ -16,6 +16,7 @@ import PIL.Image as image
 import numpy as np
 import math
 import os
+import sys
 
 # Class for Curves
 class Curve():
@@ -153,7 +154,7 @@ def write(location, text):
         file.write(text + '\n\n')
         
         
- # https://stackoverflow.com/questions/31836104/pyinstaller-and-onefile-how-to-include-an-image-in-the-exe-file
+# https://stackoverflow.com/questions/31836104/pyinstaller-and-onefile-how-to-include-an-image-in-the-exe-file
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -163,3 +164,6 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+def check_file_exists(file):
+    return os.path.exists(file)

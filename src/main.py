@@ -51,13 +51,16 @@ class CurvePathGenerator():
                               (0, 50),
                               (100, 50)]
         self.using_raw_rpappa_coords = True
+        self.image_overlay_exists = False
 
         # Path to image
-        self.image_location = util.Resource_Path('src\\overlay.png')
+        self.image_location = util.resource_path('overlay.png')
+        self.image_overlay_exists = util.check_file_exists(self.image_location)
 
         # Path to output file
-        self.text_location = util.Resource_Path('src\\code.txt')
+        self.text_location = util.resource_path('code.txt')
 
+        # Curves List
         self.curves = []
 
         # Reset the Graph
@@ -98,13 +101,16 @@ class CurvePathGenerator():
         self.update_button.on_clicked(self.update)
 
         # Create image overlay
-        self.overlay = util.Overlay(self.ax, self.image_location)
+        if self.image_overlay_exists:
+            self.overlay = util.Overlay(self.ax, self.image_location)
+            # Draw Background image
+            self.overlay.draw()
 
-        # Reset Button
-        ax_reset_button = plt.axes([0.9, 0.0, 0.1, 0.1])
-        reset_text = "Reset"
-        self.reset_button = widget.Button(ax_reset_button, reset_text)
-        self.reset_button.on_clicked(self.reset)
+        # # Reset Button
+        # ax_reset_button = plt.axes([0.9, 0.0, 0.1, 0.1])
+        # reset_text = "Reset"
+        # self.reset_button = widget.Button(ax_reset_button, reset_text)
+        # self.reset_button.on_clicked(self.reset)
 
         # Text Inputs
         startx_ax = plt.axes([.2, .1, .05, .05])
@@ -125,7 +131,6 @@ class CurvePathGenerator():
         self.endx = widget.TextBox(endx_ax, "End X", initial=str(self.default_verts[3][0]))
         self.endy = widget.TextBox(endy_ax, "End Y", initial=str(self.default_verts[3][1]))
 
-        #self.create_checkboxes()
 
         # Set graph bound to 0 --> overlay size
         self.x_bounds = (0, self.overlay.dim()[0])
@@ -135,8 +140,7 @@ class CurvePathGenerator():
         self.ax.set_xlim(self.x_bounds)
         self.ax.set_ylim(self.y_bounds)
 
-        # Draw Background image
-        self.overlay.draw()
+
 
     # Update figure
     # Called when Update Button is pressed
