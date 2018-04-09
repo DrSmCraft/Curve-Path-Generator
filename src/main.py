@@ -54,11 +54,11 @@ class CurvePathGenerator():
         self.image_overlay_exists = False
 
         # Path to image
-        self.image_location = util.resource_path('overlay.png')
+        self.image_location = 'overlay.png'
         self.image_overlay_exists = util.check_file_exists(self.image_location)
 
         # Path to output file
-        self.text_location = util.resource_path('code.txt')
+        self.text_location = 'code.txt'
 
         # Curves List
         self.curves = []
@@ -131,10 +131,15 @@ class CurvePathGenerator():
         self.endx = widget.TextBox(endx_ax, "End X", initial=str(self.default_verts[3][0]))
         self.endy = widget.TextBox(endy_ax, "End Y", initial=str(self.default_verts[3][1]))
 
-
-        # Set graph bound to 0 --> overlay size
-        self.x_bounds = (0, self.overlay.dim()[0])
-        self.y_bounds = (0, self.overlay.dim()[1])
+        if self.image_overlay_exists:
+            # Set graph bound to 0 --> overlay size
+            self.x_bounds = (0, self.overlay.dim()[0])
+            self.y_bounds = (0, self.overlay.dim()[1])
+        else:
+            # Set graph bound to 0 --> (2000, 1000)
+            print("Overlay Image not Found!")
+            self.x_bounds = (0, 1000)
+            self.y_bounds = (0, 1000)
 
         # Set graph bounds
         self.ax.set_xlim(self.x_bounds)
@@ -145,70 +150,58 @@ class CurvePathGenerator():
     # Update figure
     # Called when Update Button is pressed
     def update(self, event):
-        self.color_path_count += 1
-        starting_radio_selection = util.get_radio_selection(self.starting_radio, self.starting_option_list)
-        alliance_radio_selection = util.get_radio_selection(self.alliance_radio, self.alliance_option_list)
+        if self.image_overlay_exists:
+            self.color_path_count += 1
+            starting_radio_selection = util.get_radio_selection(self.starting_radio, self.starting_option_list)
+            alliance_radio_selection = util.get_radio_selection(self.alliance_radio, self.alliance_option_list)
 
-        if util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[0]:
-            self.using_raw_rpappa_coords = False
-        elif util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[1]:
-            self.using_raw_rpappa_coords = True
+            if util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[0]:
+                self.using_raw_rpappa_coords = False
+            elif util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[1]:
+                self.using_raw_rpappa_coords = True
 
-        if not self.using_raw_rpappa_coords:
-            # Center image according to radio_selection
-            self.overlay.transpose(self.starting_positions[starting_radio_selection])
+            if not self.using_raw_rpappa_coords:
+                # Center image according to radio_selection
+                self.overlay.transpose(self.starting_positions[starting_radio_selection])
 
-            # set  graph bounds to radio_selection
-            self.x_bounds = (0 - self.starting_positions[starting_radio_selection][0],
-                    self.overlay.dim()[0] - self.starting_positions[starting_radio_selection][0])
-            self.y_bounds = (0 - self.starting_positions[starting_radio_selection][1],
-                    self.overlay.dim()[1] - self.starting_positions[starting_radio_selection][1])
-            self.ax.set_xlim(self.x_bounds)
-            self.ax.set_ylim(self.y_bounds)
-        elif self.using_raw_rpappa_coords:
-            # TODO Fix this, doesnt want to center to (0, 0) in top left corner
-            self.overlay.transpose((0, -self.overlay.dim()[1]))
-            # set  graph bounds to radio_selection
-            self.x_bounds = (0, self.overlay.dim()[0])
-            self.y_bounds = (self.overlay.dim()[1], 0)
-            self.ax.set_xlim(self.x_bounds)
-            self.ax.set_ylim(self.y_bounds)
+                # set  graph bounds to radio_selection
+                self.x_bounds = (0 - self.starting_positions[starting_radio_selection][0],
+                        self.overlay.dim()[0] - self.starting_positions[starting_radio_selection][0])
+                self.y_bounds = (0 - self.starting_positions[starting_radio_selection][1],
+                        self.overlay.dim()[1] - self.starting_positions[starting_radio_selection][1])
+                self.ax.set_xlim(self.x_bounds)
+                self.ax.set_ylim(self.y_bounds)
+            elif self.using_raw_rpappa_coords:
+                # TODO Fix this, doesnt want to center to (0, 0) in top left corner
+                self.overlay.transpose((0, -self.overlay.dim()[1]))
+                # set  graph bounds to radio_selection
+                self.x_bounds = (0, self.overlay.dim()[0])
+                self.y_bounds = (self.overlay.dim()[1], 0)
+                self.ax.set_xlim(self.x_bounds)
+                self.ax.set_ylim(self.y_bounds)
 
-        # Get Values from Textboxes and put them into verts
-        verts = []
-        verts.append((util.get_number(self.startx), util.get_number(self.starty)))
-        verts.append((util.get_number(self.mid1x), util.get_number(self.mid1y)))
-        verts.append((util.get_number(self.mid2x), util.get_number(self.mid2y)))
-        verts.append((util.get_number(self.endx), util.get_number(self.endy)))
+            # Get Values from Textboxes and put them into verts
+            verts = []
+            verts.append((util.get_number(self.startx), util.get_number(self.starty)))
+            verts.append((util.get_number(self.mid1x), util.get_number(self.mid1y)))
+            verts.append((util.get_number(self.mid2x), util.get_number(self.mid2y)))
+            verts.append((util.get_number(self.endx), util.get_number(self.endy)))
 
-        # Create Curve
-        curve = util.Curve(self.ax, verts, color=self.path_colors[self.color_path_count % 10])
-        self.curves.append(curve)
-        index = self.curves.index(curve)
-        if self.curves[index - 1] is not None:
-            self.curves[index - 1].clear()
+            # Create Curve
+            curve = util.Curve(self.ax, verts, color=self.path_colors[self.color_path_count % 10])
+            self.curves.append(curve)
+            index = self.curves.index(curve)
+            if self.curves[index - 1] is not None:
+                self.curves[index - 1].clear()
 
-        self.curves[index].draw()
-        for text in self.fig.texts:
-            text.remove()
-        util.write(self.text_location, curve.generate_code())
-        self.fig.text(0, .9, curve.generate_code())
-        print(curve.generate_code())
-
-        #self.create_checkboxes()
-
-
-
-    def create_checkboxes(self):
-        # Create checkboxes for curves
-        check_ax = plt.axes([.8, .8, .1, .1])
-        self.checkboxes = widget.CheckButtons(check_ax, [str(curve) for curve in self.curves],
-                                              [curve.get_visible() for curve in self.curves])
-
-        self.checkboxes.labels = [str(curve) for curve in self.curves]
-        # self.checkboxes.active = [curve.get_visible() for curve in self.curves]
-        print(self.checkboxes.labels)
-        # self.checkboxes.
+            self.curves[index].draw()
+            for text in self.fig.texts:
+                text.remove()
+            util.write(self.text_location, curve.generate_code())
+            self.fig.text(0, .9, curve.generate_code())
+            print(curve.generate_code())
+        else:
+            print("Overlay Image not Found!")
 
     def show(self):
         # Show the Graph
