@@ -53,10 +53,10 @@ class CurvePathGenerator():
         self.using_raw_rpappa_coords = True
 
         # Path to image
-        self.image_location = 'src\\overlay.png'
+        self.image_location = util.Resource_Path('src\\overlay.png')
 
         # Path to output file
-        self.text_location = 'code.txt'
+        self.text_location = util.Resource_Path('src\\code.txt')
 
         self.curves = []
 
