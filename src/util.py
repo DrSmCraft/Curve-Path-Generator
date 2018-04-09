@@ -15,6 +15,7 @@ import matplotlib.image as m_image
 import PIL.Image as image
 import numpy as np
 import math
+import os
 
 # Class for Curves
 class Curve():
