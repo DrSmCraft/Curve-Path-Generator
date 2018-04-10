@@ -16,7 +16,6 @@ Github ---> https://github.com/greater-rochester-robotics
 import matplotlib.widgets as widget
 import matplotlib.pyplot as plt
 
-
 import util
 
 # TODO Change GUI to PyQt5
@@ -26,8 +25,8 @@ import util
 class CurvePathGenerator():
     def __init__(self):
         self.starting_positions = {"Center": [90, 162],
-                                    "Right": [90, 216],
-                                    "Left": [90, 80]}
+                                    "Left": [90, 216],
+                                    "Right": [90, 80]}
         self.path_colors = {0: (0, 0, 0, 1),
                             1: (1, 0, 0, 1),
                             2: (0, 1, 0, 1),
@@ -64,15 +63,9 @@ class CurvePathGenerator():
         self.curves = []
 
         # Reset the Graph
-        self.reset(None)
+        self.set(None)
 
-    def reset(self, event):
-        # Clear all curves
-        for curve in self.curves:
-            print(curve)
-            curve.clear()
-        self.curves = []
-
+    def set(self, event):
         # Making a matplotlib figure
         self.fig = plt.figure()
         self.fig.canvas.set_window_title("Curve Path Generator")
@@ -81,7 +74,7 @@ class CurvePathGenerator():
 
         # Starting Radio Button
         ax_starting_radio = plt.axes([0.0, 0.5, 0.1, .1])
-        self.starting_option_list = ["Left", "Center", "Right"]
+        self.starting_option_list = ["Right", "Center", "Left"]
         self.starting_radio = widget.RadioButtons(ax_starting_radio, self.starting_option_list)
 
         # Alliance Radio Buttons
@@ -106,7 +99,7 @@ class CurvePathGenerator():
             # Draw Background image
             self.overlay.draw()
 
-        # # Reset Button
+        # Reset Button
         # ax_reset_button = plt.axes([0.9, 0.0, 0.1, 0.1])
         # reset_text = "Reset"
         # self.reset_button = widget.Button(ax_reset_button, reset_text)
@@ -114,13 +107,13 @@ class CurvePathGenerator():
 
         # Text Inputs
         startx_ax = plt.axes([.2, .1, .05, .05])
-        starty_ax = plt.axes([.3, .1, .05, .05])
+        starty_ax = plt.axes([.35, .1, .05, .05])
         endx_ax = plt.axes([.2, 0, .05, .05])
-        endy_ax = plt.axes([.3, 0, .05, .05])
+        endy_ax = plt.axes([.35, 0, .05, .05])
         mid1x_ax = plt.axes([.6, .1, .05, .05])
-        mid1y_ax = plt.axes([.7, .1, .05, .05])
+        mid1y_ax = plt.axes([.75, .1, .05, .05])
         mid2x_ax = plt.axes([.6, 0, .05, .05])
-        mid2y_ax = plt.axes([.7, 0, .05, .05])
+        mid2y_ax = plt.axes([.75, 0, .05, .05])
 
         self.startx = widget.TextBox(startx_ax, "Start X", initial=str(self.default_verts[0][0]))
         self.starty = widget.TextBox(starty_ax, "Start Y", initial=str(self.default_verts[0][1]))
@@ -145,7 +138,9 @@ class CurvePathGenerator():
         self.ax.set_xlim(self.x_bounds)
         self.ax.set_ylim(self.y_bounds)
 
-
+    def reset(self, event):
+        util.run_script("main.exe")
+        util.exit()
 
     # Update figure
     # Called when Update Button is pressed
@@ -155,6 +150,15 @@ class CurvePathGenerator():
             starting_radio_selection = util.get_radio_selection(self.starting_radio, self.starting_option_list)
             alliance_radio_selection = util.get_radio_selection(self.alliance_radio, self.alliance_option_list)
 
+            # Switch overlay orientation based on alliance_radio_selection
+            if alliance_radio_selection == "Red":
+                # Default is Red ---> Don't do anything
+                pass
+            elif alliance_radio_selection == "Blue":
+                self.overlay.flip_vertical()
+
+
+            # Check if using rpappa coords
             if util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[0]:
                 self.using_raw_rpappa_coords = False
             elif util.get_radio_selection(self.coord_system_radio, self.coord_system_option_list) == self.coord_system_option_list[1]:
@@ -172,8 +176,7 @@ class CurvePathGenerator():
                 self.ax.set_xlim(self.x_bounds)
                 self.ax.set_ylim(self.y_bounds)
             elif self.using_raw_rpappa_coords:
-                # TODO Fix this, doesnt want to center to (0, 0) in top left corner
-                self.overlay.transpose((0, -self.overlay.dim()[1]))
+                self.overlay.flip_horizontal(origin="upper")
                 # set  graph bounds to radio_selection
                 self.x_bounds = (0, self.overlay.dim()[0])
                 self.y_bounds = (self.overlay.dim()[1], 0)

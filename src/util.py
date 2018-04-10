@@ -18,6 +18,7 @@ import math
 import os
 import sys
 
+
 # Class for Curves
 class Curve():
     # Argument plot is an axis
@@ -35,9 +36,6 @@ class Curve():
         self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
         self.patch.fill = False
         self.patch.set_color(self.color)
-
-
-
 
     def draw(self):
         self.patch.set_visible(True)
@@ -63,7 +61,6 @@ class Curve():
         code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), %i)' % (self.generate_comment(), int(round(y[0])), int(round(y[1])), int(round(y[2])), int(round(x[0])), int(round(x[1])), int(round(x[2])), int(math.ceil(self.get_length())))
         return code
 
-
     def generate_equation_numpy(self):
         # Finding equation
         xlist, ylist = zip(*self.verts)
@@ -79,22 +76,19 @@ class Curve():
     #     x = '(1-x)**2 * %i + 2(1-x) '
 
     def get_length(self):
-        # # https://stackoverflow.com/questions/29438398/cheap-way-of-calculating-cubic-bezier-length
-        # TODO Fix this function - I don't know how to get length of a curve, right now Im averaging distance between control points
-        chord = distance(self.verts[3], self.verts[0])
-        cont_net = distance(self.verts[0], self.verts[1]) + distance(self.verts[1], self.verts[2]) + distance(self.verts[2], self.verts[3])
-        return (cont_net + chord) / 2
-
-
+        total = 0
+        previous = self.verts[0]
+        for t in range(0, 100):
+            if self.value_at_t(t)[0] >= self.verts[3][0] or self.value_at_t(t)[1] >= self.verts[3][1]:
+                return total
+            total += distance(self.value_at_t(t), previous)
+            previous = self.value_at_t(t)
+        return total
 
     def value_at_t(self, t):
-        # https://stackoverflow.com/questions/17099776/trying-to-find-length-of-a-bezier-curve-with-4-points
-        # t2 = t * t;
-        # t3 = t2 * t;
-        # return a + (-a * 3 + t * (3 * a - a * t)) * t + (3 * b + t * (-6 * b + b * 3 * t)) * t + (c * 3 - c * 3 * t) * t2 + d * t3
-        eq1 = self.generate_equation_numpy()[0](t)
-        eq2 = self.generate_equation_numpy()[1](t)
-        return distance((eq1, 0), (0, eq2))
+        eq1 = self.generate_equation_numpy()[0]
+        eq2 = self.generate_equation_numpy()[1]
+        return eq1(t), eq2(1)
 
     def __str__(self):
         return "Curve: " + str(self.name)
@@ -113,7 +107,6 @@ class Overlay():
         self.im = image.open(self.name, "r")
         self.img = m_image.imread(self.name)
 
-
     def draw(self):
         self.plot.imshow(self.img)
 
@@ -124,6 +117,19 @@ class Overlay():
         self.plot.set_visible(False)
         self.plot.imshow(self.img, origin=origin, extent=(0-transposition_coord[0], self.dim()[0] - transposition_coord[0], 0-transposition_coord[1], self.dim()[1] - transposition_coord[1]))
         self.plot.set_visible(True)
+
+    def flip_horizontal(self, origin="lower"):
+        self.transpose([0, 0], origin=origin)
+
+    def flip_vertical(self, origin="lower"):
+        ar = np.fliplr(self.img)
+        self.plot.imshow(ar, origin=origin)
+
+    def flip(self, top_left, lower_right, origin="lower"):
+        self.plot.imshow(self.img, origin=origin, extent=(top_left[0], top_left[1], lower_right[0]-top_left[0], lower_right[1]-top_left[1]))
+
+
+
 
 def distance(p1, p2):
     return math.sqrt(((p2[1] - p1[1]) ** 2) + (p2[0] - p1[0]) ** 2)
@@ -164,6 +170,15 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+
+def run_script(file):
+    os.system(file)
+
+
+def exit():
+    sys.exit()
+
 
 def check_file_exists(file):
     return os.path.exists(file)
