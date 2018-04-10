@@ -101,9 +101,10 @@ class Curve():
 class Overlay():
     # Argument plot is an axis
     # Argument name is string containing directory name
-    def __init__(self, plot, name):
+    def __init__(self, plot, name, alliance="Red"):
         self.plot = plot
         self.name = name
+        self.alliance = alliance
         self.im = image.open(self.name, "r")
         self.img = m_image.imread(self.name)
 
@@ -118,17 +119,25 @@ class Overlay():
         self.plot.imshow(self.img, origin=origin, extent=(0-transposition_coord[0], self.dim()[0] - transposition_coord[0], 0-transposition_coord[1], self.dim()[1] - transposition_coord[1]))
         self.plot.set_visible(True)
 
-    def flip_horizontal(self, origin="lower"):
+    def flip(self, origin="lower"):
         self.transpose([0, 0], origin=origin)
 
-    def flip_vertical(self, origin="lower"):
-        ar = np.fliplr(self.img)
-        self.plot.imshow(ar, origin=origin)
+    def invert(self):
+        self.img = np.fliplr(self.img)
 
-    def flip(self, top_left, lower_right, origin="lower"):
-        self.plot.imshow(self.img, origin=origin, extent=(top_left[0], top_left[1], lower_right[0]-top_left[0], lower_right[1]-top_left[1]))
+    def flip_alliance(self, alliance="Red"):
+        if alliance == "Blue":
+            if self.alliance == "Red":
+                self.alliance = "Blue"
+                self.invert()
 
-
+        elif alliance == "Red":
+            if self.alliance == "Blue":
+                self.alliance = "Red"
+                self.invert()
+        else:
+            print("Alliance code is wrong")
+            pass
 
 
 def distance(p1, p2):
@@ -160,16 +169,6 @@ def write(location, text):
         file.write(text + '\n\n')
         
         
-# https://stackoverflow.com/questions/31836104/pyinstaller-and-onefile-how-to-include-an-image-in-the-exe-file
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
 
 
 def run_script(file):

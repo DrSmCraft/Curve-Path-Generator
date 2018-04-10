@@ -21,6 +21,7 @@ import util
 # TODO Change GUI to PyQt5
 # https://stackoverflow.com/questions/12459811/how-to-embed-matplotlib-in-pyqt-for-dummies
 
+
 # Main Class
 class CurvePathGenerator():
     def __init__(self):
@@ -151,11 +152,7 @@ class CurvePathGenerator():
             alliance_radio_selection = util.get_radio_selection(self.alliance_radio, self.alliance_option_list)
 
             # Switch overlay orientation based on alliance_radio_selection
-            if alliance_radio_selection == "Red":
-                # Default is Red ---> Don't do anything
-                pass
-            elif alliance_radio_selection == "Blue":
-                self.overlay.flip_vertical()
+            self.overlay.flip_alliance(alliance=alliance_radio_selection)
 
 
             # Check if using rpappa coords
@@ -176,7 +173,7 @@ class CurvePathGenerator():
                 self.ax.set_xlim(self.x_bounds)
                 self.ax.set_ylim(self.y_bounds)
             elif self.using_raw_rpappa_coords:
-                self.overlay.flip_horizontal(origin="upper")
+                self.overlay.flip(origin="upper")
                 # set  graph bounds to radio_selection
                 self.x_bounds = (0, self.overlay.dim()[0])
                 self.y_bounds = (self.overlay.dim()[1], 0)
