@@ -18,6 +18,6 @@ Good to know:
 Future Plans:   
 -Change Gui to Use PyQt5 instead of Matplotlib.   
 -Make Curve Code more accurate.
-   
+ ![alt text](https://raw.githubusercontent.com/DrSmCraft/Curve-Path-Generator/master/Screenshot.PNG)
     
 This app was not tested extensively. Let me know of bugs and glitches.
