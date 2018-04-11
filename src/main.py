@@ -62,6 +62,7 @@ class CurvePathGenerator():
 
         # Curves List
         self.curves = []
+        self.curve_limit = 2
 
         # Reset the Graph
         self.set(None)
@@ -187,6 +188,9 @@ class CurvePathGenerator():
             verts.append((util.get_number(self.mid2x), util.get_number(self.mid2y)))
             verts.append((util.get_number(self.endx), util.get_number(self.endy)))
 
+            # if there are more curves than self.curve_limit, delete first one
+            if len(self.curves) > self.curve_limit:
+                del self.curves[0]
             # Create Curve
             curve = util.Curve(self.ax, verts, color=self.path_colors[self.color_path_count % 10])
             self.curves.append(curve)
