@@ -17,7 +17,7 @@ import numpy as np
 import math
 import os
 import sys
-
+import PyQt5.QtWidgets as widget
 
 # Class for Curves
 class Curve():
@@ -36,6 +36,8 @@ class Curve():
         self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
         self.patch.fill = False
         self.patch.set_color(self.color)
+
+        self.equation = self.generate_equation()
 
     def draw(self):
         self.patch.set_visible(True)
@@ -56,9 +58,9 @@ class Curve():
         #     "end": {"x": 150, "y": 195}} * /
         #    (195 + -330 * t + 420 * Math.pow(t, 2)) / (-270 + 1140 * t + -750 * Math.pow(t, 2))
         # , 214)
-        x = self.generate_equation_numpy()[0].deriv()
-        y = self.generate_equation_numpy()[1].deriv()
-        code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), %i)' % (self.generate_comment(), int(round(y[0])), int(round(y[1])), int(round(y[2])), int(round(x[0])), int(round(x[1])), int(round(x[2])), int(math.ceil(self.get_length())))
+        x = self.equation[0].deriv()
+        y = self.equation[1].deriv()
+        code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), %i)' % (self.generate_comment(), int(round(y[2])), int(round(y[1])), int(round(y[0])), int(round(x[2])), int(round(x[1])), int(round(x[0])), int(math.ceil(self.get_length())))
         return code
 
     def generate_equation_numpy(self):
@@ -71,9 +73,30 @@ class Curve():
         eq_y = np.poly1d(y_param)
         return [eq_x, eq_y]
 
-    # def generate_equation(self):
-    #     # https: // javascript.info / bezier - curve
-    #     x = '(1-x)**2 * %i + 2(1-x) '
+    def generate_equation(self):
+        # https: // javascript.info / bezier - curve
+        # http://mathfaculty.fullerton.edu/mathews/n2003/BezierCurveMod.html
+        x0, y0 = self.verts[0]
+        x1, y1 = self.verts[1]
+        x2, y2 = self.verts[2]
+        x3, y3 = self.verts[3]
+
+        # Finding x
+        term3_x = (x3 - x0 + (3 * x1) - (3 * x2))
+        term2_x = (3 * (x0 + x2 - (2 * x1)))
+        term1_x = (3 * (x1 - x0))
+        term0_x = x0
+        eq_x = np.poly1d([term3_x, term2_x, term1_x, term0_x])
+
+        # Finding y
+        term3_y = (y3 - y0 + (3 * y1) - (3 * y2))
+        term2_y = (3 * (y0 + y2 - (2 * y1)))
+        term1_y = (3 * (y1 - y0))
+        term0_y = y0
+        eq_y = np.poly1d([term3_y, term2_y, term1_y, term0_y])
+
+        return [eq_x, eq_y]
+
 
     def get_length(self):
         total = 0
@@ -88,7 +111,7 @@ class Curve():
     def value_at_t(self, t):
         eq1 = self.generate_equation_numpy()[0]
         eq2 = self.generate_equation_numpy()[1]
-        return eq1(t), eq2(1)
+        return [eq1(t), eq2(t)]
 
     def __str__(self):
         return "Curve: " + str(self.name)
@@ -140,9 +163,18 @@ class Overlay():
             pass
 
 
+# https://stackoverflow.com/questions/12459811/how-to-embed-matplotlib-in-pyqt-for-dummies#12465861
+class M_Canvas(widget.QDialog):
+    def __init__(self, parent=None, figure=None):
+        super(M_Canvas, self.win).__init__()
+        self.win.parent = parent
+        self.win.figure = figure
+
+
 def distance(p1, p2):
     return math.sqrt(((p2[1] - p1[1]) ** 2) + (p2[0] - p1[0]) ** 2)
 
+#def derivative(equation):
 
 # Function to get radiobutton input
 def get_radio_selection(radio, option_list):
@@ -150,7 +182,8 @@ def get_radio_selection(radio, option_list):
         if radio.circles[select].get_facecolor()[0] < 0.5:
             return option_list[select]
 
-# Function to get number of a textbox
+
+# Function to get number of a textbox ---> Matplotlib
 def get_number(textbox):
     try:
         out = float(textbox.text)
@@ -159,16 +192,14 @@ def get_number(textbox):
         return None
 
 
-# Function to put text into Textbox
+# Function to put text into Textbox ---> Matplotlib
 def put_text(textbox, text):
-    #textbox.
     textbox.text = text
+
 
 def write(location, text):
     with open(location, 'a+') as file:
         file.write(text + '\n\n')
-        
-        
 
 
 def run_script(file):

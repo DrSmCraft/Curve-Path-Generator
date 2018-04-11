@@ -25,9 +25,9 @@ import util
 # Main Class
 class CurvePathGenerator():
     def __init__(self):
-        self.starting_positions = {"Center": [90, 162],
-                                    "Left": [90, 216],
-                                    "Right": [90, 80]}
+        self.starting_positions = {"Center": [90, (324 // 2) - 12],
+                                    "Left": [90, 257],
+                                    "Right": [90, 67]}
         self.path_colors = {0: (0, 0, 0, 1),
                             1: (1, 0, 0, 1),
                             2: (0, 1, 0, 1),
@@ -46,10 +46,14 @@ class CurvePathGenerator():
                       (50, 0),
                       (0, 50),
                       (100, 50)]
-        self.default_verts = [(0, 0),
-                              (50, 0),
-                              (0, 50),
-                              (100, 50)]
+        # self.default_verts = [(0, 0),
+        #                       (50, 0),
+        #                       (0, 50),
+        #                       (100, 50)]
+        self.default_verts = [(260, 110),
+                              (270, 70),
+                              (300, 80),
+                              (310, 90)]
         self.using_raw_rpappa_coords = True
         self.image_overlay_exists = False
 
@@ -100,6 +104,7 @@ class CurvePathGenerator():
             self.overlay = util.Overlay(self.ax, self.image_location)
             # Draw Background image
             self.overlay.draw()
+            print(self.overlay.dim())
 
         # Reset Button
         # ax_reset_button = plt.axes([0.9, 0.0, 0.1, 0.1])
@@ -201,9 +206,11 @@ class CurvePathGenerator():
             self.curves[index].draw()
             for text in self.fig.texts:
                 text.remove()
-            util.write(self.text_location, curve.generate_code())
-            self.fig.text(0, .9, curve.generate_code())
+            code = curve.generate_code()
+            util.write(self.text_location, code)
+            self.fig.text(0, .9, code)
             print(curve.generate_code())
+            #print("\n" + str(curve.generate_equation()))
         else:
             print("Overlay Image not Found!")
 
