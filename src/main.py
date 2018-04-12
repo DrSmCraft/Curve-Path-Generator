@@ -26,8 +26,8 @@ import util
 class CurvePathGenerator():
     def __init__(self):
         self.starting_positions = {"Center": [90, (324 // 2) - 12],
-                                    "Left": [90, 257],
-                                    "Right": [90, 67]}
+                                    "Left": [90, 67],
+                                    "Right": [90, 257]}
         self.path_colors = {0: (0, 0, 0, 1),
                             1: (1, 0, 0, 1),
                             2: (0, 1, 0, 1),
@@ -46,14 +46,14 @@ class CurvePathGenerator():
                       (50, 0),
                       (0, 50),
                       (100, 50)]
-        # self.default_verts = [(0, 0),
-        #                       (50, 0),
-        #                       (0, 50),
-        #                       (100, 50)]
-        self.default_verts = [(260, 110),
-                              (270, 70),
-                              (300, 80),
-                              (310, 90)]
+        self.default_verts = [(0, 0),
+                              (50, 0),
+                              (0, -50),
+                              (100, -50)]
+        # self.default_verts = [(260, 110),
+        #                       (270, 70),
+        #                       (300, 80),
+        #                       (310, 90)]
         self.using_raw_rpappa_coords = True
         self.image_overlay_exists = False
 
@@ -104,13 +104,12 @@ class CurvePathGenerator():
             self.overlay = util.Overlay(self.ax, self.image_location)
             # Draw Background image
             self.overlay.draw()
-            print(self.overlay.dim())
 
         # Reset Button
         # ax_reset_button = plt.axes([0.9, 0.0, 0.1, 0.1])
         # reset_text = "Reset"
         # self.reset_button = widget.Button(ax_reset_button, reset_text)
-        # self.reset_button.on_clicked(self.reset)
+        # self.reset_button.on_clicked(self.set)
 
         # Text Inputs
         startx_ax = plt.axes([.2, .1, .05, .05])
@@ -174,10 +173,11 @@ class CurvePathGenerator():
                 # set  graph bounds to radio_selection
                 self.x_bounds = (0 - self.starting_positions[starting_radio_selection][0],
                         self.overlay.dim()[0] - self.starting_positions[starting_radio_selection][0])
-                self.y_bounds = (0 - self.starting_positions[starting_radio_selection][1],
-                        self.overlay.dim()[1] - self.starting_positions[starting_radio_selection][1])
+                self.y_bounds = (self.overlay.dim()[1] - self.starting_positions[starting_radio_selection][1],
+                                 0 - self.starting_positions[starting_radio_selection][1])
                 self.ax.set_xlim(self.x_bounds)
                 self.ax.set_ylim(self.y_bounds)
+
             elif self.using_raw_rpappa_coords:
                 self.overlay.flip(origin="upper")
                 # set  graph bounds to radio_selection

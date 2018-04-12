@@ -97,15 +97,14 @@ class Curve():
 
         return [eq_x, eq_y]
 
-
     def get_length(self):
         total = 0
         previous = self.verts[0]
-        for t in range(0, 100):
+        for t in range(0, 100, 1):
             if self.value_at_t(t)[0] >= self.verts[3][0] or self.value_at_t(t)[1] >= self.verts[3][1]:
                 return total
-            total += distance(self.value_at_t(t), previous)
-            previous = self.value_at_t(t)
+            total += distance(self.value_at_t(t/100), previous)
+            previous = self.value_at_t(t/100)
         return total
 
     def value_at_t(self, t):
@@ -163,18 +162,26 @@ class Overlay():
             pass
 
 
-# https://stackoverflow.com/questions/12459811/how-to-embed-matplotlib-in-pyqt-for-dummies#12465861
-class M_Canvas(widget.QDialog):
-    def __init__(self, parent=None, figure=None):
-        super(M_Canvas, self.win).__init__()
-        self.win.parent = parent
-        self.win.figure = figure
-
-
+# Returns distince between two points
 def distance(p1, p2):
     return math.sqrt(((p2[1] - p1[1]) ** 2) + (p2[0] - p1[0]) ** 2)
 
-#def derivative(equation):
+
+# Returns polynomial equation of tangent line to equation at x
+def tangent_line(equation, x):
+    y = equation(x)
+    slope = equation.deriv()(x)
+    b = y - (slope * x)
+    eq = [slope, b]
+    return np.poly1d(eq)
+
+
+# Returns angle between two linear polynomials (in radians)
+def get_angle(eq1, eq2):
+    a1 = math.atan(eq1[1])
+    a2 = math.atan(eq2[1])
+    return math.pi - abs(a1 - a2)
+
 
 # Function to get radiobutton input
 def get_radio_selection(radio, option_list):
