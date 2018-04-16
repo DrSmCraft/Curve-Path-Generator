@@ -11,6 +11,8 @@ File for useful classes and functions.
 # Imports
 import matplotlib.path as path
 import matplotlib.patches as patches
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.image as m_image
 import PIL.Image as image
 import numpy as np
@@ -18,14 +20,16 @@ import math
 import os
 import sys
 import PyQt5.QtWidgets as widget
+import PyQt5.QtGui as gui
 
 # Class for Curves
 class Curve():
     # Argument plot is an axis
     # Argument verts is vertices list
     # Argument Color is for curve color, defaults to black
-    def __init__(self, plot, verts, color=(0, 0, 0, 1), name="Curve"):
+    def __init__(self, plot, verts, color=(0, 0, 0, 1), name="Curve", control_points=True):
         self.plot = plot
+        self.control_points = control_points
         self.verts = verts
         self.color = color
         self.name = name
@@ -34,47 +38,44 @@ class Curve():
             self.codes.append(4)
         self.path = path.Path(self.verts, self.codes)
         self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
+        self.points = None
         self.patch.fill = False
         self.patch.set_color(self.color)
 
+
+
         self.equation = self.generate_equation()
+        self.start_angle = self.get_start_angle()
+        self.end_angle = self.get_end_angle()
+        #print("Start angle: " + str(self.start_angle), "End angle: " + str(self.end_angle))
 
     def draw(self):
         self.patch.set_visible(True)
         self.plot.add_patch(self.patch)
+        if self.control_points:
+            self.anchors = self.plot.plot(*zip(*self.verts), marker='o', ls='')
 
     def clear(self):
-        # self.patch.remove()
         self.patch.set_visible(False)
+        self.anchors.pop(0).remove()
+
+    def set_visable(self, bool):
+        # TODO Figure this out
+        self.patch.set_visible(bool)
+        self.anchors.pop(0).remove()
+
 
     def generate_comment(self):
-        string = '/*{"start":{"x":%i, "y":%i}, "mid1":{"x":%i, "y":%i}, "mid2":{"x":%i, "y":%i}, "end":{"x":%i, "y":%i}} */' % (self.verts[0][0], self.verts[0][1], self.verts[1][0], self.verts[1][1], self.verts[2][0], self.verts[2][1], self.verts[3][0], self.verts[3][1])
+        string = '/*{"start":{"x":%i, "y":%i}, "mid1":{"x":%i, "y":%i}, "mid2":{"x":%i, "y":%i}, "end":{"x":%i, "y":%i}, "startAngle":%d, "endAngle":%d} */' % (self.verts[0][0], self.verts[0][1], self.verts[1][0], self.verts[1][1], self.verts[2][0], self.verts[2][1], self.verts[3][0], self.verts[3][1], self.start_angle, self.end_angle)
         return string
 
     def generate_code(self):
-        # new
-        # PathSegment(t ->
-        # / *{"start": {"x": 100, "y": 25}, "mid1": {"x": 10, "y": 90}, "mid2": {"x": 110, "y": 100},
-        #     "end": {"x": 150, "y": 195}} * /
-        #    (195 + -330 * t + 420 * Math.pow(t, 2)) / (-270 + 1140 * t + -750 * Math.pow(t, 2))
-        # , 214)
         x = self.equation[0].deriv()
         y = self.equation[1].deriv()
         code = 'new PathSegment(t -> \n%s\n (%i * Math.pow(t, 2) + %i * t + %i) / (%i * Math.pow(t, 2) + %i * t + %i), %i)' % (self.generate_comment(), int(round(y[2])), int(round(y[1])), int(round(y[0])), int(round(x[2])), int(round(x[1])), int(round(x[0])), int(math.ceil(self.get_length())))
         return code
 
-    def generate_equation_numpy(self):
-        # Finding equation
-        xlist, ylist = zip(*self.verts)
-        tt = np.linspace(0, 5, len(xlist))
-        x_param = np.polyfit(tt, xlist, 3)
-        y_param = np.polyfit(tt, ylist, 3)
-        eq_x = np.poly1d(x_param)
-        eq_y = np.poly1d(y_param)
-        return [eq_x, eq_y]
-
     def generate_equation(self):
-        # https: // javascript.info / bezier - curve
         # http://mathfaculty.fullerton.edu/mathews/n2003/BezierCurveMod.html
         x0, y0 = self.verts[0]
         x1, y1 = self.verts[1]
@@ -98,18 +99,29 @@ class Curve():
         return [eq_x, eq_y]
 
     def get_length(self):
-        total = 0
-        previous = self.verts[0]
-        for t in range(0, 100, 1):
-            if self.value_at_t(t)[0] >= self.verts[3][0] or self.value_at_t(t)[1] >= self.verts[3][1]:
-                return total
-            total += distance(self.value_at_t(t/100), previous)
-            previous = self.value_at_t(t/100)
-        return total
+        # total = 0
+        # previous = self.verts[0]
+        # for t in range(0, 100, 1):
+        #     if self.value_at_t(t)[0] >= self.verts[3][0] or self.value_at_t(t)[1] >= self.verts[3][1]:
+        #         return total
+        #     total += distance(self.value_at_t(t/100), previous)
+        #     previous = self.value_at_t(t/100)
+        # return total
+        chord = distance(self.verts[0], self.verts[3])
+        sum = distance(self.verts[0], self.verts[1]) + distance(self.verts[1], self.verts[2]) + distance(self.verts[2], self.verts[3])
+        return (chord + sum) / 2
+
+    def get_end_angle(self):
+        eq = get_linear_equation(self.verts[2], self.verts[3])
+        return math.degrees(get_angle(np.poly1d([0, 0]), eq))
+
+    def get_start_angle(self):
+        eq = get_linear_equation(self.verts[0], self.verts[1])
+        return math.degrees(get_angle(np.poly1d([0, 0]), eq))
 
     def value_at_t(self, t):
-        eq1 = self.generate_equation_numpy()[0]
-        eq2 = self.generate_equation_numpy()[1]
+        eq1 = self.equation[0]
+        eq2 = self.equation[1]
         return [eq1(t), eq2(t)]
 
     def __str__(self):
@@ -117,6 +129,27 @@ class Curve():
 
     def get_visible(self):
         return self.patch.get_visible()
+
+    def set_visible(self, new_state):
+        self.patch.set_visible(new_state)
+
+    def change_start(self, new_coord):
+        self.verts[0] = new_coord
+
+    def change_mid1(self, new_coord):
+        self.verts[1] = new_coord
+
+    def change_mid2(self, new_coord):
+        self.verts[2] = new_coord
+
+    def change_end(self, new_coord):
+        self.verts[3] = new_coord
+
+    def change_verts(self, new_verts):
+        self.verts = new_verts
+
+    def get_verts(self):
+        return self.verts
 
 
 # Class for Overlay
@@ -162,6 +195,33 @@ class Overlay():
             pass
 
 
+
+
+
+
+
+
+
+
+
+def make_points_from_string(comment_string=None, equation_string=None):
+    def make_points_from_comment(string):
+        out = []
+        for i in string.split("{"):
+            if i[1] == "x":
+                comma_index = i.index(",")
+                end_semicolon = i.index("}", comma_index)
+                out.append([int(i[4:comma_index]), int(i[comma_index + 6: end_semicolon])])
+            print(i)
+
+        return out
+
+    if comment_string is not None and equation_string is not None:
+        return make_points_from_comment(comment_string)
+
+
+
+
 # Returns distince between two points
 def distance(p1, p2):
     return math.sqrt(((p2[1] - p1[1]) ** 2) + (p2[0] - p1[0]) ** 2)
@@ -181,6 +241,20 @@ def get_angle(eq1, eq2):
     a1 = math.atan(eq1[1])
     a2 = math.atan(eq2[1])
     return math.pi - abs(a1 - a2)
+
+
+# get linear equation given two points
+def get_linear_equation(point1, point2):
+    x1, y1 = point1[0], point1[1]
+    x2, y2 = point2[0], point2[1]
+    try:
+        slope = (y2 - y1) / (x2 - x1)
+    except ZeroDivisionError:
+        slope = 0
+    b = y1 - (slope * x1)
+    eq = [slope, b]
+    return np.poly1d(eq)
+
 
 
 # Function to get radiobutton input

@@ -25,9 +25,13 @@ import util
 # Main Class
 class CurvePathGenerator():
     def __init__(self):
-        self.starting_positions = {"Center": [90, (324 // 2) - 12],
-                                    "Left": [90, 67],
-                                    "Right": [90, 257]}
+        # self.starting_positions = {"Center": [90, (324 // 2) - 12],
+        #                             "Left": [90, 67],
+        #                             "Right": [90, 257]}
+        self.starting_positions = {"Center": [20, (324 // 2) - 12],
+                                    "Left": [20, 67],
+                                    "Right": [20, 257]}
+
         self.path_colors = {0: (0, 0, 0, 1),
                             1: (1, 0, 0, 1),
                             2: (0, 1, 0, 1),
@@ -58,14 +62,14 @@ class CurvePathGenerator():
         self.image_overlay_exists = False
 
         # Path to image
-        self.image_location = 'overlay.png'
+        self.image_location = 'overlayCopy.png'
         self.image_overlay_exists = util.check_file_exists(self.image_location)
 
         # Path to output file
         self.text_location = 'code.txt'
 
         # Curves List
-        self.curves = []
+        self.curves = [None]
         self.curve_limit = 2
 
         # Reset the Graph
@@ -120,6 +124,7 @@ class CurvePathGenerator():
         mid1y_ax = plt.axes([.75, .1, .05, .05])
         mid2x_ax = plt.axes([.6, 0, .05, .05])
         mid2y_ax = plt.axes([.75, 0, .05, .05])
+        code_import_ax = plt.axes([.8, .9, .05, .05])
 
         self.startx = widget.TextBox(startx_ax, "Start X", initial=str(self.default_verts[0][0]))
         self.starty = widget.TextBox(starty_ax, "Start Y", initial=str(self.default_verts[0][1]))
@@ -129,6 +134,7 @@ class CurvePathGenerator():
         self.mid2y = widget.TextBox(mid2y_ax, "Mid2 Y", initial=str(self.default_verts[2][1]))
         self.endx = widget.TextBox(endx_ax, "End X", initial=str(self.default_verts[3][0]))
         self.endy = widget.TextBox(endy_ax, "End Y", initial=str(self.default_verts[3][1]))
+        self.code_import = widget.TextBox(code_import_ax, "Comment Import")
 
         if self.image_overlay_exists:
             # Set graph bound to 0 --> overlay size
@@ -193,17 +199,16 @@ class CurvePathGenerator():
             verts.append((util.get_number(self.mid2x), util.get_number(self.mid2y)))
             verts.append((util.get_number(self.endx), util.get_number(self.endy)))
 
-            # if there are more curves than self.curve_limit, delete first one
-            if len(self.curves) > self.curve_limit:
-                del self.curves[0]
+
             # Create Curve
             curve = util.Curve(self.ax, verts, color=self.path_colors[self.color_path_count % 10])
-            self.curves.append(curve)
-            index = self.curves.index(curve)
-            if self.curves[index - 1] is not None:
-                self.curves[index - 1].clear()
+            try:
+                self.curves[0].clear()
+            except:
+                print("Can't clear")
+            self.curves[0] = curve
 
-            self.curves[index].draw()
+            self.curves[0].draw()
             for text in self.fig.texts:
                 text.remove()
             code = curve.generate_code()
