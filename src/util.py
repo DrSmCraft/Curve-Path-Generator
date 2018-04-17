@@ -194,6 +194,9 @@ class Overlay():
             print("Alliance code is wrong")
             pass
 
+    def clear(self):
+        self.plot.set_visible(False)
+
 
 
 

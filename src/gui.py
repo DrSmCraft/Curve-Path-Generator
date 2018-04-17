@@ -62,23 +62,6 @@ class Visualizer(FigureCanvas):
 
 
 
-# class CurveBox(widget.QWidget):
-#     def __init__(self, parent=None, curve_entries=None):
-#         self.parent = parent
-#         self.curve_entries = curve_entries
-#         # self.layout = widget.QBoxLayout(self.parent)
-#         self.addSelectWidget()
-#
-#     def addSelectWidget(self):
-#
-#         for entry in self.curve_entries:
-#             entry.addSelectWidget(widget.QRadioButton(self.parent))
-#
-#     def getSelected(self):
-#         for entry in self.curve_entries:
-#             if entry.getSelected():
-#                 return entry
-
 
 
 
@@ -193,11 +176,11 @@ class CurvePathGenerator():
                               (0, -50),
                               (100, -50)]
 
-        self.using_raw_rpappa_coords = True
+        self.using_raw_rpappa_coords = False
         self.image_overlay_exists = False
 
         # Path to image
-        self.image_location = 'overlayCopy.png'
+        self.image_location = 'overlay.png'
         self.image_overlay_exists = util.check_file_exists(self.image_location)
 
         # Path to output file
@@ -218,7 +201,6 @@ class CurvePathGenerator():
 
         self.create_fig()
         self.create_gui()
-        # self.curve_box = CurveBox(parent=self.window, curve_entries=self.curve_entries)
 
 
 
@@ -234,7 +216,8 @@ class CurvePathGenerator():
         self.vis = Visualizer(parent=self.window, fig=self.fig)
         vis_w, vis_h = self.vis.get_width_height()
         # vis.move(self.dim[0] // 2 - vis_w // 2, self.dim[1]//2 - vis_h // 2)
-        self.vis.move(225, 30)
+        self.vis.move(50, 30)
+
 
         self.update_button = widget.QPushButton(self.window)
         self.update_button.setText("Update")
@@ -245,8 +228,61 @@ class CurvePathGenerator():
 
         self.create_coord_entries()
         self.create_curve_entries()
+        self.create_coord_system_selection()
+        self.create_starting_position_selection()
         self.vis.plot()
 
+    # Create starting position frame and selection widgets
+    def create_starting_position_selection(self):
+        self.starting_pos_frame = widget.QFrame(self.window)
+        self.starting_pos_frame.setFrameShape(widget.QFrame.StyledPanel)
+        vertical_layout = widget.QVBoxLayout(self.starting_pos_frame)
+
+        starting_group = widget.QButtonGroup(vertical_layout)
+
+        starting_center = widget.QRadioButton(self.starting_pos_frame)
+        starting_left = widget.QRadioButton(self.starting_pos_frame)
+        starting_right = widget.QRadioButton(self.starting_pos_frame)
+
+        starting_center.setText("Center")
+        starting_right.setText("Right")
+        starting_left.setText("Left")
+
+        starting_group.addButton(starting_center)
+        starting_group.addButton(starting_left)
+        starting_group.addButton(starting_right)
+
+        vertical_layout.addWidget(starting_left)
+        vertical_layout.addWidget(starting_right)
+        vertical_layout.addWidget(starting_center)
+
+        self.starting_pos_frame.move(0, 120)
+        starting_left.toggled.connect(lambda x: self.change_start("Left"))
+        starting_right.toggled.connect(lambda x: self.change_start("Right"))
+        starting_center.toggled.connect(lambda x: self.change_start("Center"))
+
+    # Create coordinate system position frame and selection widgets
+    def create_coord_system_selection(self):
+        self.coord_sys_frame = widget.QFrame(self.window)
+        self.coord_sys_frame.setFrameShape(widget.QFrame.StyledPanel)
+        vertical_layout = widget.QVBoxLayout(self.coord_sys_frame)
+        coord_sys_group = widget.QButtonGroup(vertical_layout)
+
+        rpappa_coord = widget.QRadioButton(self.coord_sys_frame)
+        native_coord = widget.QRadioButton(self.coord_sys_frame)
+
+        vertical_layout.addWidget(rpappa_coord)
+        vertical_layout.addWidget(native_coord)
+
+        rpappa_coord.setText("Rpappa Coord")
+        native_coord.setText("Native Coord")
+
+        coord_sys_group.addButton(rpappa_coord)
+        coord_sys_group.addButton(native_coord)
+
+        self.coord_sys_frame.move(0, 40)
+        rpappa_coord.toggled.connect(lambda x: self.change_coord_system(True))
+        native_coord.toggled.connect(lambda x: self.change_coord_system(False))
 
     # Creates coord entries
     def create_coord_entries(self):
@@ -297,7 +333,7 @@ class CurvePathGenerator():
     # Creates curves and binds them to a CurveEntry
     def create_curves(self):
         for curve in range(self.curve_limit):
-            self.curve_entries[curve].setCurve(util.Curve(self.ax, self.default_verts, name="Curve " + str(curve)))
+            self.curve_entries[curve].setCurve(util.Curve(self.ax, self.default_verts, name="Curve " + str(curve), color=self.path_colors[curve]))
 
     # Function to select curve
     # updates coord entries as soon as selected, bound to CurveEntry
@@ -312,7 +348,7 @@ class CurvePathGenerator():
 
         self.fig.canvas.set_window_title("Curve Path Generator")
         self.ax = self.fig.add_subplot(111)
-        self.ax.set_position([0, 0, 1, 1])
+        self.ax.set_position([.1, 0, .8, 1])
 
         # Create image overlay
         if self.image_overlay_exists:
@@ -326,6 +362,48 @@ class CurvePathGenerator():
             for x in range(len(self.text_entries[y])):
                 #print(self.curve_selected.getCurve().get_verts())
                 self.text_entries[y][x].setText(str(self.curve_selected.getCurve().get_verts()[x][y]))
+
+
+    def change_coord_system(self, bool):
+        self.using_raw_rpappa_coords = bool
+
+        if self.using_raw_rpappa_coords:
+            self.overlay.clear()
+            self.overlay.flip(origin="upper")
+            # set  graph bounds to radio_selection
+            self.x_bounds = (0, self.overlay.dim()[0])
+            self.y_bounds = (self.overlay.dim()[1], 0)
+            self.ax.set_xlim(self.x_bounds)
+            self.ax.set_ylim(self.y_bounds)
+        else:
+            pass
+
+        self.vis.plot()
+
+
+    # Change starting pos
+    def change_start(self, new_pos="Center"):
+        self.overlay.clear()
+        if not self.using_raw_rpappa_coords:
+            # Center image according to radio_selection
+            self.overlay.transpose(self.starting_positions[new_pos])
+            # set  graph bounds to radio_selection
+            self.x_bounds = (0 - self.starting_positions[new_pos][0],
+                             self.overlay.dim()[0] - self.starting_positions[new_pos][0])
+            self.y_bounds = (self.overlay.dim()[1] - self.starting_positions[new_pos][1],
+                             0 - self.starting_positions[new_pos][1])
+            self.ax.set_xlim(self.x_bounds)
+            self.ax.set_ylim(self.y_bounds)
+
+        elif self.using_raw_rpappa_coords:
+            self.overlay.flip(origin="upper")
+            # set  graph bounds to radio_selection
+            self.x_bounds = (0, self.overlay.dim()[0])
+            self.y_bounds = (self.overlay.dim()[1], 0)
+            self.ax.set_xlim(self.x_bounds)
+            self.ax.set_ylim(self.y_bounds)
+
+        self.vis.plot()
 
     # Runs the gui
     def run(self):

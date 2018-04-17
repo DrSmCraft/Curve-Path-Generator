@@ -1,0 +1,64 @@
+new PathSegment(t -> 
+/*{"start":{"x":260, "y":60}, "mid1":{"x":265, "y":50}, "mid2":{"x":250, "y":80}, "end":{"x":210, "y":95}, "startAngle":116, "endAngle":159} */
+ (-165 * Math.pow(t, 2) + 240 * t + -30) / (-15 * Math.pow(t, 2) + -120 * t + 15), 75)
+
+new PathSegment(t -> 
+/*{"start":{"x":260, "y":60}, "mid1":{"x":265, "y":50}, "mid2":{"x":250, "y":80}, "end":{"x":220, "y":95}, "startAngle":116, "endAngle":153} */
+ (-165 * Math.pow(t, 2) + 240 * t + -30) / (15 * Math.pow(t, 2) + -120 * t + 15), 66)
+
+new PathSegment(t -> 
+/*{"start":{"x":260, "y":60}, "mid1":{"x":265, "y":50}, "mid2":{"x":250, "y":80}, "end":{"x":230, "y":95}, "startAngle":116, "endAngle":143} */
+ (-165 * Math.pow(t, 2) + 240 * t + -30) / (45 * Math.pow(t, 2) + -120 * t + 15), 58)
+
+new PathSegment(t -> 
+/*{"start":{"x":260, "y":60}, "mid1":{"x":265, "y":50}, "mid2":{"x":250, "y":80}, "end":{"x":230, "y":93}, "startAngle":116, "endAngle":146} */
+ (-171 * Math.pow(t, 2) + 240 * t + -30) / (45 * Math.pow(t, 2) + -120 * t + 15), 57)
+
+new PathSegment(t -> 
+/*{"start":{"x":0, "y":0}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":-50}, "end":{"x":100, "y":-50}, "startAngle":180, "endAngle":180} */
+ (300 * Math.pow(t, 2) + -300 * t + 0) / (750 * Math.pow(t, 2) + -600 * t + 150), 167)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":50, "y":0}, "mid2":{"x":0, "y":-50}, "end":{"x":100, "y":-50}, "startAngle":127, "endAngle":180} */
+ (-24 * Math.pow(t, 2) + 348 * t + -324) / (354 * Math.pow(t, 2) + 192 * t + -246), 234)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":132, "y":108}, "mid2":{"x":80, "y":170}, "end":{"x":80, "y":170}, "startAngle":180, "endAngle":180} */
+ (-372 * Math.pow(t, 2) + 372 * t + 0) / (312 * Math.pow(t, 2) + -312 * t + 0), 81)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":132, "y":108}, "mid2":{"x":80, "y":110}, "end":{"x":80, "y":160}, "startAngle":180, "endAngle":180} */
+ (138 * Math.pow(t, 2) + 12 * t + 0) / (312 * Math.pow(t, 2) + -312 * t + 0), 88)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":132, "y":108}, "mid2":{"x":150, "y":150}, "end":{"x":80, "y":160}, "startAngle":180, "endAngle":171} */
+ (-222 * Math.pow(t, 2) + 252 * t + 0) / (-318 * Math.pow(t, 2) + 108 * t + 0), 95)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":132, "y":108}, "mid2":{"x":110, "y":150}, "end":{"x":80, "y":160}, "startAngle":180, "endAngle":161} */
+ (-222 * Math.pow(t, 2) + 252 * t + 0) / (42 * Math.pow(t, 2) + -132 * t + 0), 77)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":132, "y":108}, "mid2":{"x":110, "y":110}, "end":{"x":80, "y":160}, "startAngle":180, "endAngle":120} */
+ (138 * Math.pow(t, 2) + 12 * t + 0) / (42 * Math.pow(t, 2) + -132 * t + 0), 77)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":110, "y":110}, "mid2":{"x":110, "y":110}, "end":{"x":80, "y":160}, "startAngle":174, "endAngle":120} */
+ (156 * Math.pow(t, 2) + -12 * t + 6) / (-156 * Math.pow(t, 2) + 132 * t + -66), 77)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":110, "y":110}, "mid2":{"x":110, "y":160}, "end":{"x":80, "y":160}, "startAngle":174, "endAngle":180} */
+ (-294 * Math.pow(t, 2) + 288 * t + 6) / (-156 * Math.pow(t, 2) + 132 * t + -66), 88)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":90, "y":110}, "mid2":{"x":110, "y":160}, "end":{"x":80, "y":160}, "startAngle":177, "endAngle":180} */
+ (-294 * Math.pow(t, 2) + 288 * t + 6) / (-336 * Math.pow(t, 2) + 372 * t + -126), 100)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":90, "y":110}, "mid2":{"x":130, "y":160}, "end":{"x":70, "y":160}, "startAngle":177, "endAngle":180} */
+ (-294 * Math.pow(t, 2) + 288 * t + 6) / (-546 * Math.pow(t, 2) + 492 * t + -126), 124)
+
+new PathSegment(t -> 
+/*{"start":{"x":132, "y":108}, "mid1":{"x":90, "y":110}, "mid2":{"x":120, "y":160}, "end":{"x":70, "y":160}, "startAngle":177, "endAngle":180} */
+ (-294 * Math.pow(t, 2) + 288 * t + 6) / (-456 * Math.pow(t, 2) + 432 * t + -126), 116)
+
