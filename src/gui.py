@@ -80,26 +80,31 @@ class CurveEntry(widget.QCheckBox):
         self.height = height
         self.curve = curve
 
-        self.label = widget.QLabel(self.parent)
-        self.label.setText(self.name)
+        self.frame = widget.QFrame(self.parent)
+        self.frame.setFrameShape(widget.QFrame.StyledPanel)
+        self.layout = widget.QHBoxLayout(self.frame)
 
-        self.visible_check = widget.QCheckBox(self.parent)
+        self.button = widget.QPushButton(self.frame)
+        self.visible_check = widget.QCheckBox(self.frame)
+        self.select = widget.QRadioButton(self.frame)
 
-        # self.select_button = widget.QPushButton(self.parent)
-        # self.select_button.setCheckable(True)
-        # self.select_button.setDown(False)
-        self.select = widget.QRadioButton(self.parent)
+        self.layout.addWidget(self.button)
+        self.layout.addWidget(self.visible_check)
+        self.layout.addWidget(self.select)
+
+        self.button.setText(self.name)
 
         self.x, self.y = 0, 0
 
     def move(self, *__args):
         x = __args[0]
         y = __args[1]
-        self.label.move(x + 4 * self.width, y)
-        self.visible_check.move(x, y)
-        self.select.move(x + 15 * self.width, y)
-        self.x = x + 4 * self.width
-        self.y = y
+        self.frame.move(x, y)
+        # self.button.move(x + 4 * self.width, y)
+        # self.visible_check.move(x, y)
+        # self.select.move(x + 24 * self.width, y)
+        # self.x = x + 4 * self.width
+        # self.y = y
 
     def isCurveVisible(self):
         return self.visible_check.isChecked()
@@ -123,16 +128,6 @@ class CurveEntry(widget.QCheckBox):
 
     def connectChecked(self, func):
         self.select.toggled.connect(func)
-
-
-
-
-
-
-
-
-
-
 
 
 
