@@ -28,7 +28,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 # import os
 import sys
 import PyQt5.QtWidgets as widget
-# import PyQt5.QtGui as gui
+import PyQt5.QtGui as gui
 # import PyQt5.QtCore as core
 
 
@@ -69,30 +69,45 @@ class Visualizer(FigureCanvas):
 
 
 
-
-class CurveEntry(widget.QCheckBox):
-    def __init__(self, parent=None, name="No name", width=5, height=4, curve=None):
-        # CurveEntry.__init__(parent=parent, name=name, width=width, height=height, curve=curve)
-        #super(CurveEntry).__init__()
+class CurveEntry(widget.QFrame):
+    def __init__(self, parent=None, text={"Check": "", "Select": "", "Button": ""}, curve=None, labeled=False):
+        # super(widget.QFrame, self).__init__(parent)
+        super().__init__()
+        # widget.QWidget.__init__(self, parent)
         self.parent = parent
-        self.name = name
-        self.width = width
-        self.height = height
+        self.text = text
+        # self.width = width
+        # self.height = height
         self.curve = curve
+        self.labeled = labeled
 
         self.frame = widget.QFrame(self.parent)
         self.frame.setFrameShape(widget.QFrame.StyledPanel)
         self.layout = widget.QHBoxLayout(self.frame)
 
-        self.button = widget.QPushButton(self.frame)
-        self.visible_check = widget.QCheckBox(self.frame)
-        self.select = widget.QRadioButton(self.frame)
+
+        if self.labeled:
+            self.button = widget.QLabel(self.frame)
+            self.visible_check = widget.QLabel(self.frame)
+            self.select = widget.QLabel(self.frame)
+        else:
+            self.button = widget.QPushButton(self.frame)
+            self.visible_check = widget.QCheckBox(self.frame)
+            self.select = widget.QRadioButton(self.frame)
+
 
         self.layout.addWidget(self.button)
         self.layout.addWidget(self.visible_check)
         self.layout.addWidget(self.select)
 
-        self.button.setText(self.name)
+        self.visible_check.setText(self.text["Check"])
+        self.button.setText(self.text["Button"])
+        self.select.setText(self.text["Select"])
+
+        # self.button.resize(self.width, self.height)
+        # self.visible_check.resize(self.width, self.height)
+        # self.select.resize(self.width, self.height)
+
 
         self.x, self.y = 0, 0
 
@@ -100,18 +115,13 @@ class CurveEntry(widget.QCheckBox):
         x = __args[0]
         y = __args[1]
         self.frame.move(x, y)
-        # self.button.move(x + 4 * self.width, y)
-        # self.visible_check.move(x, y)
-        # self.select.move(x + 24 * self.width, y)
-        # self.x = x + 4 * self.width
-        # self.y = y
 
     def isCurveVisible(self):
         return self.visible_check.isChecked()
 
     def setCurveVisible(self, bool):
         self.curve.set_visible(bool)
-        self.visible_check.setCheckState(bool)
+        # self.visible_check.setCheckState(bool)
 
     def getCurve(self):
         return self.curve
@@ -119,16 +129,29 @@ class CurveEntry(widget.QCheckBox):
     def setCurve(self, new_curve):
         self.curve = new_curve
 
-    # def addSelectWidget(self, qwidget):
-    #     self.select = qwidget
-    #     self.select.move(self.x + 60, self.y)
-
     def getSelected(self):
         return self.select.isChecked()
 
     def connectChecked(self, func):
-        self.select.toggled.connect(func)
+        if not self.labeled:
+            self.visible_check.toggled.connect(func)
+        else:
+            print("Labeled arg must be False to use connectChecked")
 
+    def connectSelected(self, func):
+        if not self.labeled:
+            self.select.toggled.connect(func)
+        else:
+            print("Labeled arg must be False to use connectSelected")
+
+    def connectButton(self, func):
+        if not self.labeled:
+            self.button.clicked.connect(func)
+        else:
+            print("Labeled arg must be False to use connectButton")
+
+    def addSelectGroup(self, group):
+        group.addButton(self.select)
 
 
 
@@ -223,9 +246,34 @@ class CurvePathGenerator():
 
         self.create_coord_entries()
         self.create_curve_entries()
+        self.create_alliance_selection()
         self.create_coord_system_selection()
         self.create_starting_position_selection()
         self.vis.plot()
+
+    def create_alliance_selection(self):
+        self.alliance_frame = widget.QFrame(self.window)
+        self.alliance_frame.setFrameShape(widget.QFrame.StyledPanel)
+        vertical_layout = widget.QVBoxLayout(self.alliance_frame)
+
+        alliance_group = widget.QButtonGroup(vertical_layout)
+
+        alliance_red = widget.QRadioButton(self.alliance_frame)
+        alliance_blue = widget.QRadioButton(self.alliance_frame)
+
+        alliance_blue.setText("Blue")
+        alliance_red.setText("Red")
+
+        alliance_group.addButton(alliance_red)
+        alliance_group.addButton(alliance_blue)
+
+        vertical_layout.addWidget(alliance_red)
+        vertical_layout.addWidget(alliance_blue)
+
+        self.alliance_frame.move(0, 120)
+        alliance_red.toggled.connect(lambda x: self.change_alliance("Red"))
+        alliance_blue.toggled.connect(lambda x: self.change_alliance("Blue"))
+
 
     # Create starting position frame and selection widgets
     def create_starting_position_selection(self):
@@ -251,7 +299,7 @@ class CurvePathGenerator():
         vertical_layout.addWidget(starting_right)
         vertical_layout.addWidget(starting_center)
 
-        self.starting_pos_frame.move(0, 120)
+        self.starting_pos_frame.move(0, 200)
         starting_left.toggled.connect(lambda x: self.change_start("Left"))
         starting_right.toggled.connect(lambda x: self.change_start("Right"))
         starting_center.toggled.connect(lambda x: self.change_start("Center"))
@@ -315,14 +363,27 @@ class CurvePathGenerator():
 
     # Creates all the curve entries
     def create_curve_entries(self):
+        self.selection_group = widget.QButtonGroup(self.window)
+        # self.curve_entry_frame = widget.QFrame(self.window)
+        # self.curve_entry_frame.setFrameShape(widget.QFrame.StyledPanel)
+        # layout = widget.QVBoxLayout(self.curve_entry_frame)
+        # self.curve_entry_frame.setLayout(layout)
         self.curve_entries = []
+        # self.curve_entry_frame.move(750, 30)
+        # self.curve_entry_frame.resize(100, 800)
+        y_offset = 50
+        heading_entry = CurveEntry(parent=self.window, text={"Check": "Visible", "Button": "Curve", "Select": "Selected"}, labeled=True)
+        heading_entry.move(750, y_offset - 40)
+        # layout.addWidget(heading_entry)
         for y in range(self.curve_limit):
-            # self.curve_entries[y] = widget.QCheckBox(self.window)
-            # self.curve_entries[y].setText("Curve " + str(y))
-            # self.curve_entries[y].move(750, y * 50 + 100)
-            self.curve_entries.append(CurveEntry(parent=self.window, name="Curve " + str(y)))
-            self.curve_entries[y].move(750, y * 50 + 100)
-            self.curve_entries[y].connectChecked(lambda x: self.select(self.curve_entries[y]))
+            # self.curve_entries.append(CurveEntry(parent=self.curve_entry_frame, text={"Check": "", "Button": "Curve " + str(y), "Select": ""}))
+            self.curve_entries.append(CurveEntry(parent=self.window, text={"Check": "", "Button": "Curve " + str(y), "Select": ""}))
+            self.curve_entries[y].connectChecked(lambda x: self.set_curve_visibility(self.curve_entries[y]))
+            self.curve_entries[y].connectSelected(lambda x: self.select_curve(self.curve_entries[y]))
+            self.curve_entries[y].connectButton(lambda x: self.change_curve_entry_settings(self.curve_entries[y]))
+            self.curve_entries[y].addSelectGroup(self.selection_group)
+            self.curve_entries[y].move(750, (y * 80) + y_offset)
+            # layout.addWidget(self.curve_entries[y])
         self.create_curves()
 
     # Creates curves and binds them to a CurveEntry
@@ -332,7 +393,7 @@ class CurvePathGenerator():
 
     # Function to select curve
     # updates coord entries as soon as selected, bound to CurveEntry
-    def select(self, entry):
+    def select_curve(self, entry):
         self.curve_selected = entry
         self.change_coord_entry_values()
 
@@ -355,12 +416,11 @@ class CurvePathGenerator():
     def change_coord_entry_values(self):
         for y in range(len(self.text_entries)):
             for x in range(len(self.text_entries[y])):
-                #print(self.curve_selected.getCurve().get_verts())
                 self.text_entries[y][x].setText(str(self.curve_selected.getCurve().get_verts()[x][y]))
 
 
-    def change_coord_system(self, bool):
-        self.using_raw_rpappa_coords = bool
+    def change_coord_system(self, system):
+        self.using_raw_rpappa_coords == "Rpappa"
 
         if self.using_raw_rpappa_coords:
             self.overlay.clear()
@@ -375,6 +435,9 @@ class CurvePathGenerator():
 
         self.vis.plot()
 
+    def change_alliance(self, new_alliance):
+        self.overlay.flip_alliance(alliance=new_alliance)
+        self.vis.plot()
 
     # Change starting pos
     def change_start(self, new_pos="Center"):
@@ -391,14 +454,17 @@ class CurvePathGenerator():
             self.ax.set_ylim(self.y_bounds)
 
         elif self.using_raw_rpappa_coords:
-            self.overlay.flip(origin="upper")
-            # set  graph bounds to radio_selection
-            self.x_bounds = (0, self.overlay.dim()[0])
-            self.y_bounds = (self.overlay.dim()[1], 0)
-            self.ax.set_xlim(self.x_bounds)
-            self.ax.set_ylim(self.y_bounds)
+            self.change_coord_system("Rpappa")
 
         self.vis.plot()
+
+    def set_curve_visibility(self, curve_entry):
+        v = not curve_entry.isCurveVisible()
+        curve_entry.setCurveVisible(v)
+        self.vis.plot()
+
+    def change_curve_entry_settings(self, curve_entry):
+        print("Working on it!")
 
     # Runs the gui
     def run(self):
